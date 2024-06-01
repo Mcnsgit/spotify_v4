@@ -39,7 +39,7 @@ export async function redirectToAuthCodeFlow(clientId) {
     const params = new URLSearchParams();
     params.append("client_id", client_id);
     params.append("response_type", "code");
-    params.append("redirect_uri", "http://localhost:3000");
+    params.append("redirect_uri", "http://localhost:3000/auth/callback");
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
@@ -156,7 +156,7 @@ function populateUI(profile) {
 export const fetchAccessToken = async (code) => {
   try {
     const code_verifier= localStorage.getItem('code_verifier');
-    const response = await axios.post('/callback', { code, code_verifier});
+    const response = await axios.post('/auth/token', { code, code_verifier});
     return response.data.accessToken;
   } catch (error) {
     console.error('Error fetching access token:', error);
@@ -250,7 +250,7 @@ export const previousTrack = async () => {
   
 
       axios
-        .post("http://localhost:3001/login", {
+        .post("http://localhost:3001/auth/login", {
           code,
         })
         .then(res => {

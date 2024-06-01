@@ -1,0 +1,43 @@
+;
+@use "../../../styles/mixins.scss"as mixin;
+
+
+.reactive-canvas{
+
+    &__container {
+        width: 100%;
+        height: 100%;
+        border-radius:10px;
+    }
+
+    &__controls {
+        display: flex;
+        flex-direction: column;
+        max-width: 400px;
+        gap: 1rem;
+        background-color: #000000;
+        
+    }
+
+    &__logo-card {
+        @include mixin.audio-card;
+        background-color: #000000;
+    }
+
+    &__logo {
+        width: 150px;
+    }
+
+    
+}
+
+.dg.main  {
+    width: 100% !important;
+}
+
+
+
+
+
+
+

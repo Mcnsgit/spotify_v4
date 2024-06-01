@@ -1,182 +1,218 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import querystring from "querystring";
+import { useState, useEffect } from "react"
+import axios from "axios"
 
-const clientId = "1f42356ed83f46cc9ffd35c525fc8541";
-const refresh_token=process.env.REFRESH_TOKEN;
-const access_token=process.env.ACCESS_TOKEN;
-const redirect_uri = "http://localhost:5173/callback";
-const params = new URLSearchParams(window.location.search); 
-const code = params.get("code");
-
-if (!code) {
-    redirectToAuthCodeFlow(clientId);
-} else {
-    const accessToken = await accessToken(clientId, code);
-    const profile = await fetchProfile(accessToken);
-    populateUI(profile);    
-
-    // Remove code from URL so we can refresh correctly.    
-}
-const authorizationEndpoint = "https://accounts.spotify.com/authorize";
-const tokenEndpoint = "https://accounts.spotify.com/api/token";
+const clientId = '1f42356ed83f46cc9ffd35c525fc8541';
+const redirectUri = 'http://localhost:3000';
+const authEndpoint = 'https://accounts.spotify.com/authorize';
+const responseType = 'code';
 const scope = 'user-read-private user-read-email';
+  export default function useAuth(code) {
+  const [accessToken, setAccessToken] = useState()
+  const [refreshToken, setRefreshToken] = useState()
+  const [expiresIn, setExpiresIn] = useState()
 
-// Data structure that manages the current active token, caching it in localStorage
-const currentToken = {
-  get access_token() { return localStorage.getItem('access_token') || null; },
-  get refresh_token() { return localStorage.getItem('refresh_token') || null; },
-  get expires_in() { return localStorage.getItem('refresh_in') || null },
-  get expires() { return localStorage.getItem('expires') || null },
+  useEffect(() => {
+    (async () => {
+      try {
+        const {
+          data: { access_token, refresh_token, expires_in },
+        } = await axios.post(`http://localhost:3001/auth/login`, {
+          code,
+        })
+        setAccessToken(access_token)
+        setRefreshToken(refresh_token)
+        setExpiresIn(expires_in)
+        window.history.pushState({}, null, "/")
+      } catch {
+        window.location = "/"
+      }
+    })()
+  }, [code])
 
-  save: function (response) {
-    const { access_token, refresh_token, expires_in } = response;
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
-    localStorage.setItem('expires_in', expires_in);
+  useEffect(() => {
+    if (!refreshToken || !expiresIn) return
+    const interval = setInterval(async () => {
+      try {
+        const {
+          data: { access_token, expires_in },
+        } = await axios.post(`http://localhost:3001/auth/refresh`, {
+          refreshToken,
+        })
+        setAccessToken(access_token)
+        setExpiresIn(expires_in)
+      } catch {
+        window.location = "/"
+      }
+    }, (expiresIn - 60) * 1000)
 
-    const now = new Date();
-    const expiry = new Date(now.getTime() + (expires_in * 1000));
-    localStorage.setItem('expires', expiry);
-  }
-};
+    return () => clearInterval(interval)
+  }, [refreshToken, expiresIn])
 
-//Function to generate an access token using the refresh token everytime the website is opened or refreshed
-export const getAccessToken = async (client_id, client_secret, refresh_token) => {
-  //Creates a base64 code of client_id:client_secret as required by the API
-  const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
-
-  //The response will contain the access token
-  const response = await fetch(TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: {
-      Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: querystring.stringify({
-      grant_type: 'refresh_token',
-      refresh_token,
-      }),
-  });
-
-return response.json();
-};
-
-
-// If we find a code, we're in a callback, do a token exchange
-if (code) {
-  const token = await getToken(code);
-  currentToken.save(token);
-
-  // Remove code from URL so we can refresh correctly.
-  const url = new URL(window.location.href);
-  url.searchParams.delete("code");
-
-  const updatedUrl = url.search ? url.href : url.href.replace('?', '');
-  window.history.replaceState({}, document.title, updatedUrl);
+  return accessToken
 }
 
-// If we have a token, we're logged in, so fetch user data and render logged in template
-if (currentToken.access_token) {
-  const userData = await getUserData();
-  renderTemplate("main", "logged-in-template", userData);
-  renderTemplate("oauth", "oauth-template", currentToken);
-}
 
-// Otherwise we're not logged in, so render the login template
-if (!currentToken.access_token) {
-  renderTemplate("main", "login");
-}
+//   document.location = authUrl.toString()
+  
+//   authUrl.search = new URLSearchParams(params).toString();
+//   window.location.href = authUrl.toString();
+// };
 
-async function redirectToSpotifyAuthorize() {
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const randomValues = crypto.getRandomValues(new Uint8Array(64));
-  const randomString = randomValues.reduce((acc, x) => acc + possible[x % possible.length], "");
 
-  const code_verifier = randomString;
-  const data = new TextEncoder().encode(code_verifier);
-  const hashed = await crypto.subtle.digest('SHA-256', data);
+// const generateCodeVerifier = (length) => {
+//   let text = '';
+//   let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  
+//   for (let i = 0; i < length; i++) {
+//     text += possible.charAt(Math.floor(Math.random() * possible.length));
+//   }
+//   return text;
+// }
 
-  const code_challenge_base64 = btoa(String.fromCharCode(...new Uint8Array(hashed)))
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
 
-  window.localStorage.setItem('code_verifier', code_verifier);
+// if (!code)  {
+//   RedirectToAuthCodeFlow(client_id);
+// } else {
+//   getAccessToken(client_id, code);
 
-  const authUrl = new URL(authorizationEndpoint)
-  const params = {
-    response_type: 'code',
-    client_id: clientId,
-    scope: scope,
-    code_challenge_method: 'S256',
-    code_challenge: code_challenge_base64,
-    redirect_uri: redirect_uri,
-  };
+//   Profile = await fetchProfile(code);
+//   populateUI(profile);
+// }
+// const codeVerifier  = generateRandomString(64);
 
-  authUrl.search = new URLSearchParams(params).toString();
-  window.location.href = authUrl.toString(); // Redirect the user to the authorization server for login
-}
+// const sha256 = async (plain) => {
+//   const encoder = new TextEncoder()
+//   const data = encoder.encode(plain)
+//   return window.crypto.subtle.digest('SHA-256', data)
+// }
+// async function generateCodeChallenge(codeVerifier) {
+//   const data = new TextEncoder().encode(codeVerifier);
+//   const digest = await window.crypto.subtle.digest('SHA-256', data);
+//   return btoa(String.fromCharCode(...new Uint8Array(digest)))
+//     .replace(/=/g, '')
+//     .replace(/\+/g, '-')
+//     .replace(/\//g, '_');
+// }
 
-// Soptify API Calls
-async function getToken(code) {
-  const code_verifier = localStorage.getItem('code_verifier');
 
-  const response = await fetch(tokenEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      client_id: clientId,
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: redirect_uri,
-      code_verifier: code_verifier,
-    }),
-  });
+//     export async function getAccessToken(client_id, code) {
+//   const verifier = localStorage.getItem("verifier");
 
-  return await response.json();
-}
+//   const params = new URLSearchParams({
+//     client_id: client_id,
+//     grant_type: "authorization_code",
+//     code: code,
+//     redirect_uri: 'http://localhost:3000/dashboard',
+//     code_verifier: verifier
 
-async function refreshToken() {
-  const response = await fetch(tokenEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      client_id: clientId,
-      grant_type: 'refresh_token',
-      refresh_token: currentToken.refresh_token
-    }),
-  });
+//   });
 
-  return await response.json();
-}
+//   const result = await fetch("https://accounts.spotify.com/api/token", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+//     body: params
+//   });
 
-async function getUserData() {
-  const response = await fetch("https://api.spotify.com/v1/me", {
-    method: 'GET',
-    headers: { 'Authorization': 'Bearer ' + currentToken.access_token },
-  });
+//   const { access_token } = await result.json();
+//   return access_token;
+// }
+// export async function fetchProfile(token) {
+//   const response = await fetch("https://api.spotify.com/v1/me", {
+//       method: "GET", headers: { Authorization: `Bearer ${token}` }
+//   });
 
-  return await response.json();
-}
+//   return await response.json();
+// }
 
-// Click handlers
-async function loginWithSpotifyClick() {
-  await redirectToSpotifyAuthorize();
-}
+      
 
-async function logoutClick() {
-  localStorage.clear();
-  window.location.href = redirect_uri;
-}
 
-async function refreshTokenClick() {
-  const token = await refreshToken();
-  currentToken.save(token);
-  renderTemplate("oauth", "oauth-template", currentToken);
-}
 
+
+
+// const hashed = await sha256(codeVerifier)
+// const codeChallenge = base64encode(hashed);
+// const clientId = client_id;
+// const redirectUri = "http://localhost:3000/dashboard"
+
+// const authUrl = new URL("https://accounts.spotify.com/authorize")
+
+// // generated in the previous step
+// window.localStorage.setItem('code_verifier', codeVerifier);
+
+// const urlparams =  {
+//   response_type: 'code',
+//   client_id: clientId,
+//   scope,
+//   code_challenge_method: 'S256',
+//   code_challenge: codeChallenge,
+//   redirect_uri: redirectUri,
+// }
+
+// authUrl.search = new URLSearchParams(urlparams).toString();
+// window.location.href = authUrl.toString();
+
+// const urlParams = new URLSearchParams(window.location.search);
+
+
+
+// // copied from the previous step
+// export default function useAuth(code) {
+//   const [accessToken, setAccessToken] = useState();
+//   const [refreshToken, setRefreshToken] = useState();
+//   const [expiresIn, setExpiresIn] = useState();
+  
+//   useEffect(() => {
+//     axios
+//     .post("http://localhost:3001/auth/login", { code })
+//     .then(res => {
+//       setAccessToken(res.data.accessToken);
+//       setRefreshToken(res.data.refreshToken);
+//       setExpiresIn(res.data.expiresIn);
+//       window.history.pushState({}, null, "/dashboard");
+//     })
+//     .catch(() => {
+//       window.location = "/";
+//     });
+//   }, [code]);
+  
+//   useEffect(() => {
+//     if (!refreshToken || !expiresIn) return;
+//     const interval = setInterval(() => {
+//       axios
+//       .post("http://localhost:3001/refresh", { refreshToken })
+//       .then(res => {z
+//         setAccessToken(res.data.accessToken);
+//         setExpiresIn(res.data.expiresIn);
+//       })
+//       .catch(() => {
+//         window.location = "/";
+//       });
+//     }, (expiresIn - 60) * 1000);
+    
+//     return () => clearInterval(interval);
+//   }, [refreshToken, expiresIn]);
+  
+//   return accessToken;
+// }
+
+
+
+// export const accessToken = async (client_id, code) => {
+//  const params = new URLSearchParams({
+//     client_id: client_id,
+//     grant_type: 'authorization_code',
+//     code: code,
+//     redirect_uri: 'http://localhost:3000/dashboard',
+//     code_verifier: verifier
+//   });
+
+//   const result = await fetch("https://accounts.spotify.com/api/token", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+//     body: params.toString()
+//   });
+
+//   const data = await result.json();
+//   return data.access_token;
+// };
