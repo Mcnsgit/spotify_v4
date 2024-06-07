@@ -1,22 +1,34 @@
-import { combineReducers } from "redux";
-import userReducer from './userReducer';
-import tokenReducer from './tokenReducer';
-import playlistReducer from './playlistReducer';
-import songsReducer from './songsReducer';
-import albumsReducer from './albumsReducer';
-import artistsReducer from './artistsReducer';
-import uiReducer from './uiReducer';
-import browseReducer from './browseReducer';
-import soundReducer from './soundReducer';
+import { combineReducers } from 'redux';
 
-export default combineReducers({
-  userReducer,
-  tokenReducer,
-  playlistReducer,
-  songsReducer,
-  albumsReducer,
-  artistsReducer,
-  uiReducer,
-  browseReducer,
-  soundReducer
+import sessionReducer from './sessionReducer.js';
+import userReducer from './userReducer';
+import playlistReducer from './playlistReducer';
+import browseReducer from './browseReducer';
+
+import uiReducer from './uiReducer';
+import {playbackReducer} from './playbackReducer';
+import visualizerReducer from './visualizerReducer';
+import artistReducer from './artistsReducer.js';
+import albumReducer from './albumsReducer.js';
+import playerReducer from './playerReducer';
+import searchReducer from './searchReducer.js';
+
+
+
+const rootReducer = combineReducers({
+  playback: playbackReducer,
+  visualizer: visualizerReducer,
+  session: sessionReducer,
+  token: sessionReducer,
+  deviceId: sessionReducer,
+  user: userReducer,
+  playlist: playlistReducer,
+  browse: browseReducer,
+  ui: uiReducer,
+  artist: artistReducer,
+  album: albumReducer,
+  player: playerReducer,
+  search: searchReducer,
 });
+
+export default rootReducer;

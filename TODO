@@ -1,0 +1,61 @@
+
+Todo:
+  ☐ Item
+  6/6/2024- build /ceck order plan
+  1. Basic Reusable Components
+  **Button**
+  [x] - A general button component that can be reused across different parts of the application.
+  **Input Bar*
+  [x]  A general input bar component for user input.
+
+      ### **Milestones**
+
+      [x] **Milestone 1**: Set up the React project and Redux store.
+      [x] **Milestone 2**: Implement Spotify OAuth flow and secure token storage.      **User Image and Username Hyperlink**
+      [x] Component to display user's image and hyperlink their username to their Spotify profile.
+   [ ]  2. Layout Components
+   [x] **Header** Container for the search bar, user image, and username.
+  - [ ]  **Footer** - Container for song details and music controls.
+  - [ ]  **Side Menu** - Navigation for future settings, analytics, and sign out.
+  - [ ]  3. Main Functional Components
+  - [ ]  **Search Bar and Search Results**   
+  - [ ] Search bar component for user to search tracks.
+    [] Component to display search results and handle track selection.   
+  - [ ]  **Player**
+      - Component to handle playback of selected tracks.
+  - [ ]  **Playlist View**
+      - Component to display user's library and handle selection of playlists/albums.
+      - Queue button to show the current music queue.
+  - [ ]  4. Advanced Features
+  - [ ]  **Canvas/Visualizer**
+      - Component for audio analysis and 3D visuals.
+  - [ ]  **Song Details**
+      - Component to dynamically update song title and image.
+      - Like song and add to playlist functionality.
+  - [ ]  **Music Controls**
+      - Controls for previous, pause/play, next, repeat, and volume.
+      - Share functionality.
+  - [ ]  5. Future Enhancements
+  - [ ]  **Settings**
+      - Placeholder for future settings component.
+  - [ ]  **Analytics**
+      - Placeholder for future analytics component.
+  - [ ]  Pseudocode Plan
+  - [ ]  **Basic Reusable Components**
+      - [ ]  `Button` component
+      - `InputBar` component
+      - `UserProfile` component (user image and username hyperlink)
+  - [ ]  **Layout Components**
+      - [ ]  `Header` component (includes `SearchBar` and `UserProfile`)
+      - [ ]  `Footer` component (includes `SongDetails` and `MusicControls`)
+      - [ ]  `SideMenu` component (includes settings, analytics, and sign out links)
+  - [ ]  **Main Functional Components**
+      - [ ]  `SearchBar` component
+      - [ ]  `SearchResults` component
+      - [ ]  `Player` component
+      - [ ]  `PlaylistView` component
+      - [ ]  `QueueButton` component
+  - [ ]  **Advanced Features**
+      - [ ]  `Visualizer` component
+      - [ ]  `SongDetails` component (dynamic update)
+      - [ ]  `MusicControls` component (prev, pause/play, next, repeat, volume, share)

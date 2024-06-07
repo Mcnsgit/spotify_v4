@@ -1,0 +1,32 @@
+:root {
+  --primary: #ff7315;
+  --light: #f4f4f4;
+  --dark: #3a3535;
+  --darkest: #232020;
+}
+
+.shape-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+.shape-selector__img-container {
+  width: 33%;
+}
+.shape-selector__img {
+  max-width: 100px;
+  height: 100px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 10px;
+}
+.shape-selector__img:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+.--selected {
+  border: 5px solid var(--primary);
+  transform: scale(1.05);
+}/*# sourceMappingURL=shape-selector.css.map */

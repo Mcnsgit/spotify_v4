@@ -1,59 +1,58 @@
+import { createSlice } from '@reduxjs/toolkit';
 
-// reducers/authReducer.js
 const initialState = {
-  isAuthenticated: false,
-  accessToken: null,
-  refresh_token: null,
-  expiresIn: null,
-  error: null,
+  user: null,
+  discover_weekly: null,
+  followed_artists: null,
+  saved_albums: null,
+  top_artists: null,
+  top_tracks: null,
+  user_playlists: null,
 };
 
-const authReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'LOGIN_SUCCESS':
-      return {
-        ...state,
-        isAuthenticated: true,
-        accessToken: action.payload.accessToken,
-        refresh_token: action.payload.refresh_token,
-        expiresIn: action.payload.expiresIn,
-        error: null,
-      };
-    case 'LOGIN_FAILURE':
-      return {
-        ...state,
-        isAuthenticated: false,
-        accessToken: null,
-        refresh_token: null,
-        expiresIn: null,
-        error: action.payload.error,
-      };
-    case 'LOGOUT':
-      return initialState;
-    case 'REFRESH_TOKEN_SUCCESS':
-      return {
-        ...state,
-        accessToken: action.payload.accessToken,
-        expiresIn: action.payload.expiresIn,
-      };
-    case 'REFRESH_TOKEN_FAILURE':
-      return {
-        ...state,
-        isAuthenticated: false,
-        accessToken: null,
-        refresh_token: null,
-        expiresIn: null,
-        error: action.payload.error,
-      };
-      case 'SET_TOKEN':
-      return {
-        ...state,
-        accessToken: action.payload.accessToken,
-        expiresIn: action.payload.expiresIn,
-      };
-    default:
-      return state;
-  }
-};
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    setUser: (state, action) => {
+      state.user = action.payload;
+    },
+    clearUser: (state) => {
+      state.user = null;
+    },
+    setPlaylists: (state, action) => {
+      state.user_playlists = action.payload;
+    },
+    setTopArtists: (state, action) => {
+      state.top_artists = action.payload;
+    },
+    setTopTracks: (state, action) => {
+      state.top_tracks = action.payload;
+    },
+    setDiscoverWeekly: (state, action) => {
+      state.discover_weekly = action.payload;
+    },
+    setSavedAlbums: (state, action) => {
+      state.saved_albums = action.payload;
+    },
+    setFollowedArtists: (state, action) => {
+      state.followed_artists = action.payload;
+    },
+    resetState: () => initialState,
+  },
+});
 
-export default authReducer;
+export const {
+  setUser,
+  clearUser,
+  setPlaylists,
+  setTopArtists,
+  setTopTracks,
+  setDiscoverWeekly,
+  setSavedAlbums,
+  setFollowedArtists,
+  resetState,
+} = authSlice.actions;
+
+export const authReducer = authSlice.reducer;
+export { initialState };

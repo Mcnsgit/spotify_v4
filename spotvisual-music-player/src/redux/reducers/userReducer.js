@@ -1,37 +1,59 @@
-export const userReducer = (state = {}, action) => {
+import { createSlice } from '@reduxjs/toolkit';
 
-  switch (action.type) {
+const userSlice = createSlice({
+  name: 'user',
+  initialState: {user: null},
+  reducers: {
+    setUSer: (state, action) => {
+      state.user = action.payload;
+    },
+    clearUser: (state) => {
+      state.user = null;
+  },
+  },
+});
 
-  case "FETCH_USER_SUCCESS":
-    return {
-      ...state,
-      user: action.user,
-      fetchUserError: false
-    };
+export const { setUSer, clearUser } = userSlice.actions;
+export default userSlice.reducer;
 
-  case "FETCH_USER_ERROR":
-    return {
-      ...state,
-      fetchUserError: true
-    };
+  //   fetchUserError: false,
+  //   songAddedToLibrary: false,
+  //   songId: null
+  // },
+  // reducers: {}
 
-  case "ADD_SONG_TO_LIBRARY_SUCCESS":
-    return {
-      ...state,
-      songAddedToLibrary: true,
-      songId: action.songId
-    };
+  // switch (action.type) {
 
-  case "ADD_SONG_TO_LIBRARY_ERROR":
-    return {
-      ...state,
-      songAddedToLibrary: false
-    };
+  // case "FETCH_USER_SUCCESS":
+  //   return {
+  //     ...state,
+  //     user: action.user,
+  //     fetchUserError: false
+  //   };
 
-  default:
-    return state;
-  }
+  // case "FETCH_USER_ERROR":
+  //   return {
+  //     ...state,
+  //     fetchUserError: true
+  //   };
 
-};
+//   case "ADD_SONG_TO_LIBRARY_SUCCESS":
+//     return {
+//       ...state,
+//       songAddedToLibrary: true,
+//       songId: action.songId
+//     };
 
-export default userReducer;
+//   case "ADD_SONG_TO_LIBRARY_ERROR":
+//     return {
+//       ...state,
+//       songAddedToLibrary: false
+//     };
+
+//   default:
+//     return state;
+//   }
+
+// };
+
+// export default userReducer;

@@ -1,18 +1,52 @@
-const defaultState = {
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
   title: "Songs"
 };
 
-export const uiReducer = (state = defaultState, action) => {
-  switch (action.type) {
-    case "UPDATE_HEADER_TITLE":
-      return {
-        ...state,
-        title: action.title
-      };
+const uiSlice = createSlice({
+  name: 'ui',
+  initialState,
+  reducers: {
+    updateHeaderTitle: (state, action) => {
+      state.title = action.payload;
+    },
+  },
+});
 
-    default:
-      return state;
-  }
-};
+export const { updateHeaderTitle } = uiSlice.actions;
+export default uiSlice.reducer;
 
-export default uiReducer;
+//   switch (action.type) {
+
+//   case "UPDATE_HEADER_TITLE":
+//     return {
+//       ...state,
+//       title: action.title
+//     };
+
+//   default:
+//     return state;
+//   }
+
+// };
+
+// export default uiReducer;  
+// const defaultState = {
+//   title: "Songs"
+// };
+
+// export const uiReducer = (state = defaultState, action) => {
+//   switch (action.type) {
+//     case "UPDATE_HEADER_TITLE":
+//       return {
+//         ...state,
+//         title: action.title
+//       };
+
+//     default:
+//       return state;
+//   }
+// };
+
+// export default uiReducer;

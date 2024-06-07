@@ -1,14 +1,17 @@
-export const soundReducer = (state = { volume: 100}, action) => {
+const initialState = {
+  volume: 100,
+};
+
+const soundReducer = (state = initialState, action) => {
   switch (action.type) {
-  case "UPDATE_VOLUME":
-    return {
-      volume: action.volume
-    };
-
-  default:
-    return state;
+    case 'UPDATE_VOLUME':
+      return {
+        ...state,
+        volume: action.payload,
+      };
+    default:
+      return state;
   }
-
 };
 
 export default soundReducer;

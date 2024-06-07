@@ -1,0 +1,32 @@
+:root {
+  --primary: #ff7315;
+  --light: #f4f4f4;
+  --dark: #3a3535;
+  --darkest: #232020;
+}
+
+.audio-microphone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  color: white;
+  padding: 20px 20px;
+  gap: 1rem;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.audio-microphone__icon:hover {
+  color: var(--primary);
+  cursor: pointer;
+}
+.audio-microphone__icon:active {
+  transform: scale(0.9);
+}
+.audio-microphone__options {
+  display: flex;
+  justify-content: flex-end;
+  align-self: flex-end;
+  gap: 1rem;
+}/*# sourceMappingURL=audio-microphone.css.map */

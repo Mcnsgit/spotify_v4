@@ -18,10 +18,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "node-fetch": "^3.3.2",
-    "lyrics-finder": "" ,
-    "spotify-web-api-node": "^5.0.2"
+    "express": "^4.19.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17"

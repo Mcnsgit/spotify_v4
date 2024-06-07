@@ -1,18 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import {thunk} from 'redux-thunk';
-import { combineReducers } from 'redux';
-import authReducer from '../reducers/authReducer.js';
-import playerReducer from '../reducers/playerReducer.js';
-import visualizerReducer from '../reducers/visualizerReducer.js';
-
-const rootReducer = combineReducers({
-  auth: authReducer,
-  player: playerReducer,
-  visualizer: visualizerReducer,
-});
+import rootReducer from '../../redux/reducers/index.js';
 
 const store = configureStore({
-  reducer: rootReducer,
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(thunk),
+  reducer: rootReducer,  // Combined reducers
+  devTools: process.env.NODE_ENV !== 'production', // Enable Redux DevTools in development mode
 });
+
 export default store;
