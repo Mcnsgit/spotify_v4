@@ -1,16 +1,16 @@
-import { useEffect } from 'react';
+// src/components/layout/MainView.jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+import './MainView.css';
 
-const MainView = ({ children, id, pageTitle = null }) => {
-	useEffect(() => {
-		if (!pageTitle) return;
-		document.title = process.env.REACT_APP_PAGE_TITLE + pageTitle;
-	}, [pageTitle])
+const MainView = ({ children }) => (
+  <div className="main-view">
+    {children}
+  </div>
+);
 
-	return (
-		<main id={id} className="main-view">
-			{children}
-		</main>
-	)
-}
+MainView.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default MainView;

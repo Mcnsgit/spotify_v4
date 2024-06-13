@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { response } from 'express';
-import { config } from 'npm';
 
-const baseURL = 'https://api.spotify.com/v1';
 
-const apiClient = axios.create({
+
+
+const     apiClient = axios.create({
   baseURL: 'http://localhost:3001',
   headers: {
     'Content-Type': 'application/json',
@@ -13,9 +12,9 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const token = localStorage.getItem('token');
+    if (token && token.access_token) {
+      config.headers.Authorization = `Bearer ${token.access_token}`;
     }
     return config;
   },
@@ -27,18 +26,23 @@ apiClient.interceptors.response.use(
   async error => {
     if (error.response.status === 401 && !error.config._retry) {
       error.config._retry = true;
-      const refresh_token = localStorage.getItem('refresh_token');
-      try {
-        const response = await axios.get('http://localhost:3001/auth/refresh',{
-          params: {refresh_token: refresh_token },
-        });
-        localStorage.setItem('access_token', response.access_token);
-        apiClient.defaults.headers.common.Authorization = `Bearer ${response.access_token}`;
-        return apiClient(error.config);
+      const token = JSON.parse(localStorage.getItem('token')); {
+        try {
+          const response = await axios.post('http://localhost:3001/auth/refresh',{
+            params: {refresh_token: token.refresh_token },  
+          });
+          localStorage.setItem('token', JSON.stringify({
+            access_token: response.access_token,
+            refresh_token: token.refresh_token,
+            expires_at: new Date().getTime() + 3600 * 1000,
+          })); 
+          apiClient.defaults.headers.common.Authorization = `Bearer ${response.data.access_token}`;
+          return apiClient(error.config);
       } catch (refreshError) {
-        console.error('Error refreshing token', refreshError);
-        return Promise.reject(refreshError);
+          console.error('Error refreshing token', refreshError);
+          return Promise.reject(refreshError);
       }
+    }
     }
     return Promise.reject(error);
   }
@@ -54,18 +58,29 @@ export const getRefreshToken = async () => {
   const client_id = '1f42356ed83f46cc9ffd35c525fc8541';
   const url = 'https://accounts.spotify.com/api/token';
   try {
-    const response = await apiClient.post(url, new URLSearchParams({
+    const response = await apiClient.post('https://accounts.spotify.com/api/token', new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refresh_token,
-      client_id: client_id  
-    }));      
-    localStorage.setItem('access_token', response.access_token);
-    localStorage.setItem('refresh_token', response.refresh_token);
+    }));
+    localStorage.setItem('access_token', response.data.access_token);
+    localStorage.setItem('refresh_token', response.data.refresh_token);
+    return response.data;
   } catch (error) {
     console.error('Error refreshing token', error);
     return Promise.reject(error);
   }
-}
+};
+
+// Example API call function
+export const fetchUserProfile = async () => {
+  try {
+    const response = await apiClient.get('/me');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user profile', error);
+    return Promise.reject(error);
+  }
+};
 
 //   getRefreshToken();
 //   apiClient.interceptors.response.use(

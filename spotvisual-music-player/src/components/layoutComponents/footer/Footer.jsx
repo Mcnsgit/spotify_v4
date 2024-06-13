@@ -1,20 +1,14 @@
-// **Footer** - Container for song details and music controls.
-
-import PlayerControls from '../playerControls/PlayerControls.jsx';
-
+// src/components/layout/Footer.jsx
+import React from 'react';
+// import SongDetails from  './songDetails/SongDetails';
+// import PlayerControls from '../../mainComponents/playerControls/PlayerControls';
 import './Footer.css';
 
-const Footer = () => {
-  return (
-    <div className='footer'>
-    <footer className="footer">
+const Footer = ({ song, onPrev, onPlayPause, onNext }) => (
+  <footer className="footer">
 
-      <SongDetails />
 
-      <PlayerControls />
-    </footer>
-    </div>
-  );
-};
+  </footer>
+);
 
 export default Footer;

@@ -1,0 +1,36 @@
+/* src/components/reusable/PlaylistView.css */
+.playlist-view {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .playlist-view__item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .playlist-view__item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .playlist-view__image {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  
+  .playlist-view__info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .playlist-view__name {
+    font-weight: bold;
+  }
+  
+  .playlist-view__owner {
+    color: #888;
+  }
+  

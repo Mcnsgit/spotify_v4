@@ -18,16 +18,16 @@ const port = 3001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const spotify_client_id = process.env.CLIENT_ID;
+const spotify_client_id = '1f42356ed83f46cc9ffd35c525fc8541';
 const spotify_client_secret = process.env.CLIENT_SECRET;
-const spotify_redirect_uri = 'http://localhost:3000/';
+const spotify_redirect_uri = 'http://localhost:3000';
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../dist')));
 
-// app.use(express.static(path.join(__dirname, '../dist'))); 
+
 
 
 const generateRandomString = function (length) {
@@ -39,20 +39,41 @@ const generateRandomString = function (length) {
   }
   return text;
 };
-
+// const clientId = '1f42356ed83f46cc9ffd35c525fc8541';
+// 		const redirectUrl = "http://localhost:3001";
+// 		const apiUrl = "https://accounts.spotify.com/authorize";
+// 		const scope = [
+// 			"user-read-email",
+// 			"user-read-private",
+// 			"user-modify-playback-state",
+// 	  "user-read-playback-state",
+// 	  "user-read-currently-playing",
+// 	  "user-read-recently-played",
+// 	  "user-read-playback-position",
+// 	  "user-top-read",
+// 	  "playlist-read-private",
+// 		].join(' ');
+// 		const url = `${apiUrl}?client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}&response_type=code`;
+// 		};
+		
 ///authorization code 
-app.get('/auth/login', (req, res) => {
-  const scope = 'streaming user-read-email user-read-private';
+app.get('/auth/login', (req, res) => { 
   const state = generateRandomString(16);
+  const scope = 'streaming' + ' ' + 'user-read-email' + ' ' + 'user-read-private';
   const auth_query_parameters = new URLSearchParams({
-    response_type: 'code',
     client_id: spotify_client_id,
-    scope: scope,
+    response_type: 'code',
     redirect_uri: 'http://localhost:3000',
+    scope: scope,
     state: state,
   });
 
-  res.redirect(`https://accounts.spotify.com/authorize/?${auth_query_parameters.toString()}`);
+  console.log('Redirecting to Spotify Authorization...');
+  console.log('State:', state);
+  console.log('Scope:', scope);
+  console.log(`https://accounts.spotify.com/authorize?${auth_query_parameters.toString()}`);
+
+  res.redirect(`https://accounts.spotify.com/authorize?${auth_query_parameters.toString()}`);
 });
 
 
@@ -61,9 +82,11 @@ app.post('/callback', async (req, res) => {
   const code  = req.query.code;
   const state = req.query.state;
   if (!state || !code) {
+    console.log('Bad Request: Missing required parameters');
     return res.status(400).json({ error: 'Bad Request' });
   }
   try {
+    console.log('Exchanging authorization code for access token...');
     const body = new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
@@ -76,9 +99,10 @@ app.post('/callback', async (req, res) => {
         },
       });
       const { access_token, refresh_token } = response.data;
-        return res.json({ access_token, refresh_token });
+      console.log('Access token and refresh token received:', access_token, refresh_token);
+      return res.json({ access_token, refresh_token });
       }catch(error ) {
-        console.log(error);
+        console.log('Error exchanging authorization code for access token:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
       }
   });
@@ -88,6 +112,7 @@ app.post('/callback', async (req, res) => {
 app.get('/auth/refresh', async (req, res) => {
   const refresh_token = req.query.refresh_token;
   try {
+    console.log('Refreshing access token...');
     const response = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refresh_token,
@@ -98,15 +123,20 @@ app.get('/auth/refresh', async (req, res) => {
       },
     });
     const {access_token } = response.data;
+    console.log('Access token refreshed:', access_token);
     res.json({ access_token });
   } catch (error) {
+    console.log('Error refreshing access token:', error);
     res.status(500).json({ error: 'Failed to refresh token' });
   }
 });
 
-app.post('/auth/token', async(error, response, body) => { }, (req, res) => {
+app.post('/auth/token', async(error, response, body) => { 
+  console.log('Received response from /auth/token endpoint:', error, response, body);
+}, (req, res) => {
   if(!error && response.statusCode === 200) {
     const { access_token, refresh_token } = response.body;
+    console.log('Access token and refresh token received from /auth/token endpoint:', access_token, refresh_token);
     res.send({ access_token, refresh_token });
   }
 });
@@ -114,7 +144,9 @@ app.post('/auth/token', async(error, response, body) => { }, (req, res) => {
 app.get('/auth/token', async (req, res) => {
   const access_token = req.query.access_token;
   const refresh_token = req.query.refresh_token;  
+  res.json({ access_token, refresh_token });
   if (!access_token || !refresh_token) {
+    console.log('Missing required parameters');
     return res.status(400).json({ error: 'Missing required parameters' });  
   }
 });
@@ -126,3 +158,4 @@ app.get('/auth/token', async (req, res) => {
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });
+

@@ -12,10 +12,12 @@ import artistReducer from './artistsReducer.js';
 import albumReducer from './albumsReducer.js';
 import playerReducer from './playerReducer';
 import searchReducer from './searchReducer.js';
+import authSlice from './authSlice.js';
 
 
 
 const rootReducer = combineReducers({
+  auth: authSlice,
   playback: playbackReducer,
   visualizer: visualizerReducer,
   session: sessionReducer,

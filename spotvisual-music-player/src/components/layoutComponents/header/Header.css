@@ -1,10 +1,10 @@
-
-.footer {
+/* src/components/layout/Header.css */
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    height: 80px;
-    background-color: #1f1f1f;
+    background-color: #282828;
     color: white;
-}
+  }
+  

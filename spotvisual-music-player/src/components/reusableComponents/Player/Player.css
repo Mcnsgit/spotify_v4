@@ -1,0 +1,31 @@
+/* src/components/reusable/Player.css */
+.player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .player__details {
+    display: flex;
+    align-items: center;
+  }
+  
+  .player__image {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  
+  .player__info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .player__title {
+    font-weight: bold;
+  }
+  
+  .player__artist {
+    color: #888;
+  }
+  

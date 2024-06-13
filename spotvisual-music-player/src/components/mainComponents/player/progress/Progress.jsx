@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../styles/Progress.css";
+import "../../../../styles/Progress.css";
 
 const Progress = ({
     value,

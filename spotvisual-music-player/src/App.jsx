@@ -1,61 +1,84 @@
-// import React from "react";
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import SideMenu from "./components/dashboard/SideMenu/SideMenu";
-// import "bootstrap/dist/css/bootstrap.min.css";
-// import Login from "./components/login/Login";
-// import Dashboard from "./components/dashboard/Dashboard";
-// import SpotifyPlayer from 'react-spotify-web-playback-sdk';
-
-// import {Player} from "./components/player/Player";
-
-// export default function App() {
-//   const code = new URLSearchParams(window.location.search).get("code"); 
-
-//   return (
-//     <Router>
-//       <div className="app">
-//           <SideMenu />
-//           <Routes>
-//             <Route path="/" element={code ? <Dashboard code={code} /> : <Login />} />
-//             <Route path="/dashboard" element={<Dashboard />} />
-//             <Route path="/player" element={<Player />} />
-//           </Routes>
-//       </div>
-//     </Router>
-//   );
-// }
-
-import React, { useState, useEffect } from 'react';
+// App.jsx
+// src/App.jsx
+import React, { useEffect } from 'react';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Dashboard from './components/dashboard/Dashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './components/login/Login';
-import AuthContextProvider  from './utils/contexts/AuthContext.jsx';
-import PlaybackContextProvider from './utils/contexts/PlaybackContext.jsx';
-import ViewportContextProvider from './utils/contexts/ViewportContext.jsx';
-const  App = () => {
-  const [token, setToken] = useState('');
+import { setToken } from './redux/reducers/authSlice';
+// import SpotifyPlaybackProvider from './utils/SpotifyPlaybackProvider';
+
+const App = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const access_token = useSelector((state) => state.auth.access_token);
 
   useEffect(() => {
+    // Extract token from URL
+    const queryParams = new URLSearchParams(window.location.search);
+    const token = queryParams.get('token');
 
-    async function getToken() {
-      const response = await fetch('/auth/token');
-      const json = await response.json();
-      setToken(json.access_token);
+    if (token) {
+      // Save the token and redirect to dashboard
+      dispatch(setToken({ access_token: token, expires_at: Date.now() + 3600 * 1000 }));
+      navigate('/dashboard', { replace: true });
+    } else {
+      // If no token, check if already authenticated
+      fetch('/token')
+        .then(response => response.json())
+        .then(data => {
+          if (data.access_token) {
+            dispatch(setToken({ access_token: data.access_token, expires_at: Date.now() + 3600 * 1000 }));
+            navigate('/dashboard', { replace: true });
+          }
+        });
     }
-
-    getToken();
-
-  }, []);
+  }, [dispatch, navigate]);
 
   return (
-    <AuthContextProvider> 
-      <PlaybackContextProvider>
-        <ViewportContextProvider>
-        <Dashboard token={token} />
-        </ViewportContextProvider>
-      </PlaybackContextProvider>
-    </AuthContextProvider>
+
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={access_token ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to={'/dashboard'} />} />
+        </Routes>
+      </ErrorBoundary>
 
   );
-}
+};
 
 export default App;
+
+  // const dispatch = useDispatch();
+  // const navigate = useNavigate();
+  // const access_token = useSelector((state) => state.auth.access_token);
+  // const [token, setToken] = useState(null);
+
+  // useEffect(() => {
+  //   const fetchToken = async () => {
+  //     const response = await fetch('/token');
+  //     const data = await response.json();
+  //     if (data.access_token) {
+  //       setToken(data.access_token);
+  //       dispatch(setToken({ access_token: data.access_token, expires_at: Date.now() + 3600 * 1000 }));
+  //       navigate('/dashboard');
+  //     }
+  //   };
+
+  //   fetchToken();
+  // }, [dispatch, navigate]);
+
+//   return (
+//     <WebPlayback token={token}>
+//       <ErrorBoundary>
+//         <Routes>
+//           <Route path="/login" element={<Login />} />
+//           <Route path="/dashboard" element={access_token ? <Dashboard /> : <Navigate to="/login" />} />
+//           <Route path="*" element={<Navigate to={access_token ? '/dashboard' : '/login'} />} />
+//         </Routes>
+//       </ErrorBoundary>
+//       </WebPlayback>
+//   );
+// };

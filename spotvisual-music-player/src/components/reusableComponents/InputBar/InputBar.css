@@ -1,0 +1,14 @@
+/* src/components/reusable/InputBar.css */
+.input-bar {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+  }
+  
+  .input-bar:focus {
+    outline: none;
+    border-color: #1DB954;
+  }
+  
