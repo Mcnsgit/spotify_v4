@@ -1,61 +1,42 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import "./VolumeControls.css";
 
-class VolumeControls extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      volume: props.volume
-    };
-  }
+import React from "react";
+import styled from "styled-components";
+import { useStateProvider } from "../../../../utils/stateProvider.jsx";
+import axios from "axios";
 
-  updateVolume = e => {
-    this.setState({
-      volume: e.target.value
-    });
-
-    this.props.updateVolume(Math.ceil(e.target.value / 10) * 10);
-  };
-
-  render() {
-    return (
-      <div className="volume-container">
-        <i className="fa fa-volume-up" aria-hidden="true" />
-        <input
-          className="volume"
-          type="range"
-          min={0}
-          max={100}
-          value={this.state.volume}
-          onChange={this.updateVolume}
-        />
-      </div>
+export default function Volume() {
+  const [{ token }] = useStateProvider();
+  const setVolume = async (e) => {
+    await axios.put(
+      `https://api.spotify.com/v1/me/player/volume`,
+      {},
+      {
+        params: {
+          volume_percent: parseInt(e.target.value),
+        },
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
     );
-  }
+  };
+  return (
+    <Container>
+      <input type="range" min={0} max={100} onMouseUp={(e) => setVolume(e)} />
+    </Container>
+  );
 }
 
-VolumeControls.propTypes = {
-  volume: PropTypes.number,
-  updateVolume: PropTypes.func
-};
-
-export default VolumeControls;
-
-// import React from 'react';
-// import { useSpotifyPlayer } from "react-spotify-web-playback-sdk";
-
-// export default function Volume() {
-//   const player = useSpotifyPlayer();
-
-//   const handleVolumeChange = (e) => {
-//     const volume = parseFloat(e.target.value);
-//     player.setVolume(volume);
-//   };
-
-//   return (
-//     <div className="volume-control">
-//       <input type="range" min="0" max="1" step="0.01" onChange={handleVolumeChange} />
-//     </div>
-//   );
-// }
+const Container = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 2rem;
+  margin-top: -0.5rem;
+  input {
+    width: 8rem;
+    border-radius: 2rem;
+    height: 0.4rem;
+  }
+`;

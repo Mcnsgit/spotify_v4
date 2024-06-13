@@ -1,6 +1,6 @@
 // src/components/reusable/Player.jsx
 import React from 'react';
-import PlayerControls from '../../mainComponents/playerControls/PlayerControls';
+
 import PropTypes from 'prop-types';
 import './Player.css';
 
@@ -19,12 +19,6 @@ const Player = ({ track, isPlaying, onPlayPause, onPrev, onNext }) => (
         <span>No track selected</span>
       )}
     </div>
-    <PlayerControls
-      isPlaying={isPlaying}
-      onPlayPause={onPlayPause}
-      onPrev={onPrev}
-      onNext={onNext}
-    />
   </div>
 );
 

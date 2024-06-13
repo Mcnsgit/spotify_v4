@@ -6,6 +6,8 @@ import Player from '../reusableComponents/Player/Player';
 import PlaylistView from '../reusableComponents/PlaylistView/PlaylistView';
 import Visualizer from '../reusableComponents/Visualizer/Visualizer';
 import MainView from '../layoutComponents/views/MainView';
+import Footer from '../layoutComponents/footer/Footer';
+import './Dashboard.css';
 
 const dummyResults = [
   { id: '1', title: 'Song 1', artist: 'Artist 1', albumUrl: 'https://via.placeholder.com/50' },
@@ -60,6 +62,9 @@ const Dashboard = ({userData}) => {
         onNext={() => console.log('Next track')}
       />
       <Visualizer />
+      <div className="spotify_footer">
+        <Footer />
+      </div>
     </div>
   );
 };

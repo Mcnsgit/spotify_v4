@@ -41,7 +41,7 @@ const App = () => {
       <ErrorBoundary>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={access_token ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/dashboard" element={<Dashboard /> } />
           <Route path="*" element={<Navigate to={'/dashboard'} />} />
         </Routes>
       </ErrorBoundary>

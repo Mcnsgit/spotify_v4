@@ -44,5 +44,5 @@ const initialState = {
 	}
   };
   
-  export { playbackReducer, initialState };
+  export  default playbackReducer;
   

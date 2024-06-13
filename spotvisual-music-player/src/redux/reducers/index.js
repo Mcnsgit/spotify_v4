@@ -6,7 +6,7 @@ import playlistReducer from './playlistReducer';
 import browseReducer from './browseReducer';
 
 import uiReducer from './uiReducer';
-import {playbackReducer} from './playbackReducer';
+import playbackReducer from './playbackReducer';
 import visualizerReducer from './visualizerReducer';
 import artistReducer from './artistsReducer.js';
 import albumReducer from './albumsReducer.js';

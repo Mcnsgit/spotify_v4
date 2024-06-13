@@ -2,9 +2,12 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, request, redirect, url_for, session, jsonify
+from requests import  post
 import requests
 from dotenv import load_dotenv 
 import os
+import base64
+import json
 
 load_dotenv()
 
@@ -12,7 +15,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 app.config['SESSION_COOKIE_NAME'] = 'spotify_auth_cookie'
-app.SECRET_KEY = '7FDTG368$%£E4'
+app.SECRET_KEY = os.getenv('APP_SECRET_KEY')
 
 TOKEN_INFO = 'token_info'
 CLIENT_ID = os.getenv('CLIENT_ID')
@@ -116,6 +119,27 @@ def get_token():
         token_info = spotify_oauth.refresh_access_token(token_info['refresh_token'])
 
     return token_info
+
+def token():
+    auth_string = CLIENT_ID + ':' + CLIENT_SECRET
+    auth_bytes = auth_string.encode('utf-8')
+    auth_base64 = str(base64.b64encode(auth_bytes), 'utf-8')
+
+    url = "https://accounts.spotify.com/api/token"
+    headers = {
+        "Authorization": "Basic " + auth_base64,
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+    data = {"grant_type": "client_credentials"}
+    result = post(url, headers=headers, data=data)
+    json_result = json.loads(result.content)
+    token = json_result['access_token']
+    return token
+
+def get_auth_header(token):
+    return{"Authorization": "Bearer " + token}
+
+
 
 def create_spotify_oauth():
     return SpotifyOAuth(

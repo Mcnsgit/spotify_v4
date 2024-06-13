@@ -1,29 +1,120 @@
 // src/components/reusableComponents/Player/PlayerControls.jsx
 import React from 'react';
-import { usePlaybackState, usePlayerDevice } from 'react-spotify-web-playback-sdk';
+import styled from 'styled-components';
+import { useStateProvider } from '../../../utils/stateProvider.jsx';
+import { reducerCases } from '../../../redux/common/constants.js';
+import axios from "axios";
+import {
+  BsFillPlayCircleFill, 
+  BsFillPauseCircleFill,
+  BsShuffle,
+} from "react-icons/bs";
+import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
+// import { CgPlayTrackNext, CgPlayTrackPrev } from "react-icons/cg";
+// import { FiRepeat } from "react-icons/fi";
+import { LuRepeat } from "react-icons/lu";
 
-const PlayerControls = () => {
-  const playbackState = usePlaybackState();
-  const playerDevice = usePlayerDevice();
+export default function PlayerControls() {
+  const [{ token, playerState }, dispatch] = useStateProvider();
+  const changeTrack = async (type) => {
+    await axios.post(
+      `https://api.spotify.com/v1/me/player/${type}`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await axios.get(
+      "https://api.spotify.com/v1/me/player/currently-playing",
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  if (!playbackState || !playerDevice) {
-    return <div>Loading...</div>;
-  }
-
-  const { paused, track_window: { current_track } } = playbackState;
+    if (response.data !== "") {
+      const { item } = response.data;
+      const currentlyPlaying = {
+        id: item.id,
+        name: item.name,
+        artists: item.artists.map((artist) => artist.name),
+        image: item.album.images[2] && item.album.images[2].url,
+      };
+      dispatch({ type: reducerCases.SET_PLAYING, currentlyPlaying });
+    } else {
+      dispatch({ type: reducerCases.SET_PLAYING, currentlyPlaying: null });
+    }
+  };
+  const changeState = async (type) => {
+    const state = playerState ? "pause" : "play";
+    await axios.put(
+      `https://api.spotify.com/v1/me/player/${state}`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    dispatch({
+      type: reducerCases.SET_PLAYER_STATE,
+      playerState: !playerState,
+    });
+  };
 
   return (
-    <div>
-      <div>
-        <img src={current_track.album.images[0].url} alt={current_track.name} style={{ width: '50px' }} />
-        <div>{current_track.name}</div>
-        <div>{current_track.artists[0].name}</div>
+    <Container>
+      <div className="shuffle">
+        <BsShuffle />
       </div>
-      <div>
-        <button onClick={() => playerDevice.togglePlay()}>{paused ? 'Play' : 'Pause'}</button>
+      <div className="previous">
+        <BiSkipPrevious onClick={() => changeTrack("previous")} />
       </div>
-    </div>
+      <div className="state">
+        {playerState ? (
+          <BsFillPauseCircleFill onClick={changeState} />
+        ) : (
+          <BsFillPlayCircleFill onClick={changeState} />
+        )}
+      </div>
+      <div className="next">
+        <BiSkipNext onClick={() => changeTrack("next")} />
+      </div>
+      <div className="repeat">
+        <LuRepeat />
+      </div>
+    </Container>
   );
-};
-
-export default PlayerControls;
+}
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  svg {
+    color: #b3b3b3;
+    transition: 0.2s ease-in-out;
+    &:hover {
+      color: white;
+    }
+  }
+  .state {
+    svg {
+      color: white;
+      font-size: 2.5rem;
+      &:hover {
+        color: #1db954;
+      }
+    }
+  }
+  .previous,
+  .next {
+    font-size: 2rem;
+  }
+`;

@@ -1,12 +1,24 @@
-// src/components/advanced/Visualizer.jsx
-import React from 'react';
-import './Visualizer.css';
+// src/components/reusableComponents/Visualizer/Visualizer.jsx
+import React, { useEffect, useRef } from 'react';
 
-const Visualizer = () => (
-  <div className="visualizer">
-    {/* Placeholder for audio visualizations */}
-    <span>Visualizer Component</span>
-  </div>
-);
+const Visualizer = ({ audioData }) => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    const draw = () => {
+      // Example visualization code
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Drawing logic goes here
+      requestAnimationFrame(draw);
+    };
+
+    draw();
+  }, [audioData]);
+
+  return <canvas ref={canvasRef} width="300" height="300" />;
+};
 
 export default Visualizer;

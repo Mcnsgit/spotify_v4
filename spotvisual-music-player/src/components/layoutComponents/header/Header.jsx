@@ -1,5 +1,5 @@
 // src/components/layout/Header.jsx
-import React from 'react';
+import React  from 'react';
 import PropTypes from 'prop-types';
 import InputBar from '../../reusableComponents/InputBar/InputBar';
 import UserProfile from '../../reusableComponents/userProfile/UserProfile';

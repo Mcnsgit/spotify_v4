@@ -1,14 +1,18 @@
 // src/components/layout/Footer.jsx
 import React from 'react';
-// import SongDetails from  './songDetails/SongDetails';
-// import PlayerControls from '../../mainComponents/playerControls/PlayerControls';
+import { Container } from 'react-bootstrap';
+import CurrentTrack from  './songDetails/CurrentTrack';
+import PlayerControls from '../../mainComponents/playerControls/PlayerControls';
+import Volume from '../../mainComponents/playerControls/volume/Volume';
 import './Footer.css';
 
-const Footer = ({ song, onPrev, onPlayPause, onNext }) => (
-  <footer className="footer">
+export default function Footer() {
+  return (
+    <Container>
+      <CurrentTrack />
+      <PlayerControls />
+      <Volume />
+    </Container>
+  );
+}
 
-
-  </footer>
-);
-
-export default Footer;
