@@ -15,7 +15,7 @@ Todo:
       [x] Component to display user's image and hyperlink their username to their Spotify profile.
    [ ]  2. Layout Components
    [x] **Header** Container for the search bar, user image, and username.
-  - [ ]  **Footer** - Container for song details and music controls.
+   [x]  **Footer** - Container for song details and music controls.
   - [ ]  **Side Menu** - Navigation for future settings, analytics, and sign out.
   - [ ]  3. Main Functional Components
   - [ ]  **Search Bar and Search Results**   

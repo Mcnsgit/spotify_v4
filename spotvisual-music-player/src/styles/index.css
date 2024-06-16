@@ -13,6 +13,7 @@
 }
 
 body {
+    background-color: #0f0f10b3;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }

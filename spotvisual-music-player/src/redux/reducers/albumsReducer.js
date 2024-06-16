@@ -1,40 +1,28 @@
-import { createSlice } from '@reduxjs/toolkit';
 
-const albumSlice = createSlice({
-  name: 'album',
-  initialState: {
-    currentAlbum: null,
-    fetchAlbumPending: false,
-    fetchAlbumError: false,
-  },
-  reducers: {
-    clearAlbum: (state) => {
-      state.currentAlbum = null;
-    },
-    setAlbum: (state, action) => {
-      state.currentAlbum = action.payload;
-    },
-    setFetchAlbumPending: (state, action) => {
-      state.fetchAlbumPending = action.payload;
-    },
-    setFetchAlbumSuccess: (state, action) => {
-      state.currentAlbum = action.payload;
-      state.fetchAlbumPending = false;
-      state.fetchAlbumError = false;
-    },
-    setFetchAlbumError: (state, action) => {
-      state.fetchAlbumError = action.payload;
-      state.fetchAlbumPending = false;
-    },
-  },
-});
+export const albumReducer = (state = {}, action) => {
+  switch (action.type) {
+    case 'FETCH_ALBUM_SUCCESS':
+      return {
+        ...state,
+        currentAlbum: action.album,
+        fetchAlbumError: false,
+        fetchAlbumPending: false
+      };
+    case 'FETCH_ALBUM_PENDING':
+      return {
+        ...state,
+        fetchAlbumPending: true
+      };
 
-export const {
-  clearAlbum,
-  setAlbum,
-  setFetchAlbumPending,
-  setFetchAlbumError,
-  setFetchAlbumSuccess,
-} = albumSlice.actions;
+    case 'FETCH_ALBUM_ERROR':
+      return {
+        ...state,
+        fetchAlbumError: true
+      };
 
-export default albumSlice.reducer;
+    default:
+      return state;
+  }
+};
+
+export default albumReducer;

@@ -1,18 +1,21 @@
-// src/components/layout/Footer.jsx
 import React from 'react';
-import { Container } from 'react-bootstrap';
-import CurrentTrack from  './songDetails/CurrentTrack';
-import PlayerControls from '../../mainComponents/playerControls/PlayerControls';
-import Volume from '../../mainComponents/playerControls/volume/Volume';
-import './Footer.css';
 
-export default function Footer() {
-  return (
-    <Container>
-      <CurrentTrack />
-      <PlayerControls />
-      <Volume />
-    </Container>
-  );
-}
+import SongPlayer from '../../mainComponents/player/Audioplayer'
 
+const style = {
+  position: 'fixed',
+  width: '100%',
+  bottom: 0,
+  left: 0,
+  background: 'rgb(40, 40, 40)',
+  height: 80,
+  zIndex: 2000
+};
+
+const footer = props => (
+  <div className="footer" style={style}>
+    <SongPlayer />
+  </div>
+);
+
+export default footer;

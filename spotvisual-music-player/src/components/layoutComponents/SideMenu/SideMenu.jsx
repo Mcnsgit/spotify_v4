@@ -1,17 +1,69 @@
-// src/components/layout/SideMenu.jsx
-import React from 'react';
-import { Link } from 'react-router-dom';
+// src/components/layoutComponents/SideMenu/SideMenu.jsx
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { fetchPlaylistsMenu } from '../../../redux/actions/playlistActions';
+import withUiActions from '../../../hoc/uiHoc';
+import SideMenuConnected from './SideMenuConnected.jsx'; // Import the SideMenuConnected component
 import './SideMenu.css';
 
-const SideMenu = () => (
-  <nav className="side-menu">
-    <ul>
-      <li><Link to="/dashboard">Dashboard</Link></li>
-      <li><Link to="/settings">Settings</Link></li>
-      <li><Link to="/analytics">Analytics</Link></li>
-      <li><Link to="/logout">Sign Out</Link></li>
-    </ul>
-  </nav>
-);
+const sectionOne = [{ name: 'Browse', view: 'browse', id: 1 }];
+const sectionTwo = [
+  { name: 'Recently Played', view: 'recently', id: 2 },
+  { name: 'Songs', view: 'songs', id: 3 },
+  { name: 'Albums', view: 'albums', id: 4 },
+  { name: 'Artists', view: 'artists', id: 5 }
+];
 
-export default SideMenu;
+class SiderMenu extends Component {
+  state = {
+    active: 'Browse'
+  };
+
+  componentDidMount() {
+    this.props.fetchPlaylistsMenu();
+  }
+
+  setActive = (item, playlist) => {
+    this.setState({ active: item.id });
+    if (playlist) {
+      this.props.onPlaylistClick(item.id);
+    } else {
+      this.props.setView(item.view || 'browse');
+    }
+  };
+
+  generateItems(items, playlist = false) {
+    return items.map(item => (
+      <SideMenuConnected
+        key={item.id}
+        title={item.name}
+        active={this.state.active === item.id}
+        onClick={() => this.setActive(item, playlist)}
+      />
+    ));
+  };
+
+  render = () => {
+    const playlists = this.props.playlists ? this.props.playlists.items : [];
+    return (
+      <ul className="side-menu-container">
+        {this.generateItems(sectionOne)}
+        <h3 className="library-header">Your Library</h3>
+        {this.generateItems(sectionTwo)}
+        <div className="user-playlist-container">
+          <h3 className="library-header">Playlists</h3>
+          {this.generateItems(playlists, true)}
+        </div>
+      </ul>
+    );
+  };
+}
+
+const mapStateToProps = state => ({
+  playlists: state.playlistReducer.playlists || null,
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators({ fetchPlaylistsMenu }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(withUiActions(SiderMenu));

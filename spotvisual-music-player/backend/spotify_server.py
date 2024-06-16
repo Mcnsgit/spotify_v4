@@ -8,19 +8,20 @@ from dotenv import load_dotenv
 import os
 import base64
 import json
-
+from flask_cors import CORS
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+CORS(app)
+app.secret_key = os.urandom(64)
 
 app.config['SESSION_COOKIE_NAME'] = 'spotify_auth_cookie'
-app.SECRET_KEY = os.getenv('APP_SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('APP_SECRET_KEY')
 
 TOKEN_INFO = 'token_info'
-CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_ID = '1f42356ed83f46cc9ffd35c525fc8541'
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-REDIRECT_URI = 'http://localhost:3001/callback'
+REDIRECT_URI = 'http://127.0.0.1:3001'
 
 sp_oauth = SpotifyOAuth(client_id=CLIENT_ID,
                         client_secret=CLIENT_SECRET,
@@ -104,6 +105,7 @@ def dashboard():
     return ('Discover Weekly songs added successfully')
 
 # function to get the token info from the session
+@app.route('/token')
 def get_token():
     token_info = session.get(TOKEN_INFO, None)
     if not token_info:
@@ -119,7 +121,6 @@ def get_token():
         token_info = spotify_oauth.refresh_access_token(token_info['refresh_token'])
 
     return token_info
-
 def token():
     auth_string = CLIENT_ID + ':' + CLIENT_SECRET
     auth_bytes = auth_string.encode('utf-8')
@@ -146,7 +147,7 @@ def create_spotify_oauth():
         client_id = '1f42356ed83f46cc9ffd35c525fc8541',
         client_secret = '487ec052888b4917b00665fc65b8df9f',
         redirect_uri = url_for('redirect_page', _external=True),
-        scope='user-library-read playlist-modify-public playlist-modify-private'
+        scope=SCOPE
     )
 
 @app.route('/refresh')

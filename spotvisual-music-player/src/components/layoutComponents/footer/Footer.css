@@ -21,3 +21,28 @@
       padding: 0 1rem;
         }    
 }
+
+/* src/components/mainComponents/playerControls/PlayerControls.css */
+.player-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* src/components/mainComponents/playerControls/CurrentTrack.css */
+.current-track {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.current-track__image {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.current-track__info {
+  display: flex;
+  flex-direction: column;
+}

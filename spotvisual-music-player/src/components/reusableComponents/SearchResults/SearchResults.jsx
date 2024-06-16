@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './SearchResults.css';
 
-const SearchResults = ({ results, onSelect }) => (
+const SearchResults = ({ results = [], onSelect }) => (
   <div className="search-results">
     {results.map((result) => (
       <div key={result.id} className="search-result" onClick={() => onSelect(result)}>
@@ -23,8 +23,12 @@ SearchResults.propTypes = {
     title: PropTypes.string.isRequired,
     artist: PropTypes.string.isRequired,
     albumUrl: PropTypes.string.isRequired,
-  })).isRequired,
+  })),
   onSelect: PropTypes.func.isRequired,
+};
+
+SearchResults.defaultProps = {
+  results: [],
 };
 
 export default SearchResults;

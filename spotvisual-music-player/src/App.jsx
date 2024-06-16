@@ -1,84 +1,94 @@
-// App.jsx
+// // App.jsx
 // src/App.jsx
-import React, { useEffect } from 'react';
-import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Dashboard from './components/dashboard/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
-import Login from './components/login/Login';
-import { setToken } from './redux/reducers/authSlice';
-// import SpotifyPlaybackProvider from './utils/SpotifyPlaybackProvider';
+import Login from './components/mainComponents/login/Login';
+import { setToken as setReduxToken } from './redux/reducers/authSlice';
 
 const App = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const access_token = useSelector((state) => state.auth.access_token);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    // Extract token from URL
-    const queryParams = new URLSearchParams(window.location.search);
-    const token = queryParams.get('token');
+    const fetchToken = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/token');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setToken(data.access_token);
+        dispatch(setReduxToken(data.access_token));
+      } catch (error) {
+        console.error('Error fetching token:', error);
+      }
+    };
 
-    if (token) {
-      // Save the token and redirect to dashboard
-      dispatch(setToken({ access_token: token, expires_at: Date.now() + 3600 * 1000 }));
-      navigate('/dashboard', { replace: true });
-    } else {
-      // If no token, check if already authenticated
-      fetch('/token')
-        .then(response => response.json())
-        .then(data => {
-          if (data.access_token) {
-            dispatch(setToken({ access_token: data.access_token, expires_at: Date.now() + 3600 * 1000 }));
-            navigate('/dashboard', { replace: true });
-          }
-        });
-    }
-  }, [dispatch, navigate]);
+    fetchToken();
+  }, [dispatch]);
 
   return (
-
-      <ErrorBoundary>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard /> } />
-          <Route path="*" element={<Navigate to={'/dashboard'} />} />
-        </Routes>
-      </ErrorBoundary>
-
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={token ? <Dashboard token={token} /> : <Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} />} />
+      </Routes>
+    </ErrorBoundary>
   );
 };
 
 export default App;
+// import React, { useEffect, useState } from 'react';
+// import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+// import { useDispatch, useSelector } from 'react-redux';
+// import Dashboard from './components/dashboard/Dashboard';
+// import ErrorBoundary from './components/ErrorBoundary';
+// import Login from './components/login/Login';
+// import { setToken } from './redux/reducers/authSlice';
 
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
-  // const access_token = useSelector((state) => state.auth.access_token);
-  // const [token, setToken] = useState(null);
+// const App = () => {
+//   const dispatch = useDispatch();
+//   const [token, setToken] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchToken = async () => {
-  //     const response = await fetch('/token');
-  //     const data = await response.json();
-  //     if (data.access_token) {
-  //       setToken(data.access_token);
-  //       dispatch(setToken({ access_token: data.access_token, expires_at: Date.now() + 3600 * 1000 }));
-  //       navigate('/dashboard');
-  //     }
-  //   };
 
-  //   fetchToken();
-  // }, [dispatch, navigate]);
+//   useEffect(() => {
+//     const fetchToken = async () => {
+//       try {
+//         const response = await fetch('http://localhost:3001/redirect');
+//         if (!response.ok) {
+//           throw new Error('Network response was not ok');
+//         }
+//         const data = await response.json();  // Ensure the response is parsed as JSON
+//         setToken(data.access_token);
+//       } catch (error) {
+//         console.error('Error fetching token:', error);
+//       }
+//     };
+
+//     fetchToken();
+//   }, []);
 
 //   return (
-//     <WebPlayback token={token}>
+
 //       <ErrorBoundary>
+//         <div>
+//         {token ? <Dashboard token={token} /> : <Login />}
+//         </div>
 //         <Routes>
 //           <Route path="/login" element={<Login />} />
-//           <Route path="/dashboard" element={access_token ? <Dashboard /> : <Navigate to="/login" />} />
-//           <Route path="*" element={<Navigate to={access_token ? '/dashboard' : '/login'} />} />
+//           <Route path="/dashboard" element={<Dashboard /> } />
+//           <Route path="*" element={<Navigate to={'/dashboard'} />} />
 //         </Routes>
+
 //       </ErrorBoundary>
-//       </WebPlayback>
+
 //   );
 // };
+
+// export default App;
+
+  

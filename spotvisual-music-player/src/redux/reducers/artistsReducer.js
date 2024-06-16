@@ -1,64 +1,50 @@
-const initialState = {
-  currentArtist: null,
-  fetchArtistPending: false,
-  fetchArtistError: false,
-};
-
-const artistsReducer = (state = initialState, action) => {
+export const artistReducer = (state = {}, action) => {
   switch (action.type) {
     case 'FETCH_ARTIST_PENDING':
       return {
         ...state,
-        fetchArtistPending: true,
+        fetchArtistPending: true
       };
+
     case 'FETCH_ARTIST_SUCCESS':
       return {
         ...state,
-        currentArtist: action.payload,
+        currentArtist: action.artist,
         fetchArtistError: false,
-        fetchArtistPending: false,
+        fetchArtistPending: false
       };
+
     case 'FETCH_ARTIST_ERROR':
       return {
         ...state,
         fetchArtistError: true,
-        fetchArtistPending: false,
+        fetchArtistPending: false
       };
     case 'FETCH_ALBUMS_SUCCESS':
       return {
         ...state,
-        currentArtist: {
-          ...state.currentArtist,
-          albums: action.payload,
-        },
+        currentArtist: { ...state.currentArtist, ...action.albums }
       };
     case 'FETCH_POPULAR_SUCCESS':
       return {
         ...state,
-        currentArtist: {
-          ...state.currentArtist,
-          popular: action.payload,
-        },
+        currentArtist: { ...state.currentArtist, ...action.popular }
       };
     case 'FOLLOW_ARTIST':
       return {
         ...state,
-        currentArtist: {
-          ...state.currentArtist,
-          follows: true,
-        },
+        currentArtist: { ...state.currentArtist, follows: true }
       };
+
     case 'UNFOLLOW_ARTIST':
       return {
         ...state,
-        currentArtist: {
-          ...state.currentArtist,
-          follows: false,
-        },
+        currentArtist: { ...state.currentArtist, follows: false }
       };
+
     default:
       return state;
   }
 };
 
-export default artistsReducer;
+export default artistReducer;

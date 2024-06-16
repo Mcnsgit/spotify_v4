@@ -1,19 +1,15 @@
-const initialState = {
-  token: null,
-  deviceId: null,
-};
 
-const sessionReducer = (state = initialState, action) => {
+export const sessionReducer = (state = {}, action) => {
   switch (action.type) {
     case 'SET_TOKEN':
       return {
         ...state,
-        token: action.payload,
+        token: action.token
       };
     case 'SET_DEVICE_ID':
       return {
         ...state,
-        deviceId: action.payload,
+        deviceId: action.id
       };
     default:
       return state;

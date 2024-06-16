@@ -1,6 +1,6 @@
 // src/utils/spotifyAuth.js
 const clientId = '1f42356ed83f46cc9ffd35c525fc8541';
-const redirectUrl = 'http://localhost:3000';
+const redirectUrl = 'http://127.0.0.1:3001';
 
 const authorizationEndpoint = "https://accounts.spotify.com/authorize";
 const tokenEndpoint = "https://accounts.spotify.com/api/token";

@@ -1,30 +1,102 @@
-// src/components/reusable/PlaylistView.jsx
-import React from 'react';
-import PropTypes from 'prop-types';
-import './PlaylistView.css';
+// src/components/reusableComponents/Playlists/Playlists.jsx
+import React, { useEffect, useReducer } from "react";
+import axios from "axios";
+import styled from "styled-components";
+import PropTypes from "prop-types";
 
-const PlaylistView = ({ playlists, onSelect }) => (
-  <div className="playlist-view">
-    {playlists.map((playlist) => (
-      <div key={playlist.id} className="playlist-view__item" onClick={() => onSelect(playlist)}>
-        <img src={playlist.imageUrl} alt={playlist.name} className="playlist-view__image" />
-        <div className="playlist-view__info">
-          <span className="playlist-view__name">{playlist.name}</span>
-          <span className="playlist-view__owner">{playlist.owner}</span>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-PlaylistView.propTypes = {
-  playlists: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    owner: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string.isRequired,
-  })).isRequired,
-  onSelect: PropTypes.func.isRequired,
+const initialState = {
+  playlists: [],
+  selectedPlaylistId: null,
 };
 
-export default PlaylistView;
+const playlistReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_PLAYLISTS":
+      return { ...state, playlists: action.playlists };
+    case "SET_PLAYLIST_ID":
+      return { ...state, selectedPlaylistId: action.selectedPlaylistId };
+    default:
+      return state;
+  }
+};
+
+export default function Playlists({ token, onPlaylistSelect }) {
+  const [state, dispatch] = useReducer(playlistReducer, initialState);
+  const { playlists } = state;
+
+  useEffect(() => {
+    const getPlaylistData = async () => {
+      try {
+        const response = await axios.get("https://api.spotify.com/v1/me/playlists", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const { items } = response.data;
+        const playlists = items.map(({ name, id }) => ({ name, id }));
+        dispatch({ type: "SET_PLAYLISTS", playlists });
+      } catch (error) {
+        console.error("Error fetching playlists:", error);
+      }
+    };
+    if (token) {
+      getPlaylistData();
+    }
+  }, [token]);
+
+  const changeCurrentPlaylist = (selectedPlaylistId) => {
+    dispatch({ type: "SET_PLAYLIST_ID", selectedPlaylistId });
+    if (onPlaylistSelect) {
+      onPlaylistSelect(selectedPlaylistId);
+    }
+  };
+
+  return (
+    <Container>
+      <ul>
+        {playlists.map(({ name, id }) => (
+          <li key={id} onClick={() => changeCurrentPlaylist(id)}>
+            {name}
+          </li>
+        ))}
+      </ul>
+    </Container>
+  );
+}
+
+Playlists.propTypes = {
+  token: PropTypes.string.isRequired,
+  onPlaylistSelect: PropTypes.func,
+};
+
+const Container = styled.div`
+  height: 100%;
+  overflow: hidden;
+
+  ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    height: 52vh;
+    max-height: 100%;
+    overflow: auto;
+    &::-webkit-scrollbar {
+      width: 0.7rem;
+      &-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+    li {
+      display: flex;
+      gap: 1rem;
+      cursor: pointer;
+      transition: 0.3s ease-in-out;
+      &:hover {
+        color: white;
+      }
+    }
+  }
+`;

@@ -1,6 +1,14 @@
 import axios from 'axios';
 
 
+const path = 'https://api.spotify.com/v1';
+
+export const instance = axios.create({
+  baseURL: path,
+  headers: {}
+});
+
+
 
 
 const     apiClient = axios.create({

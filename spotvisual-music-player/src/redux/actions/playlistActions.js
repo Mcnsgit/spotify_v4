@@ -1,94 +1,45 @@
-import uniqBy from 'lodash/uniqBy';
+import axios from "../../utils/axios";
 
-export const fetchPlaylistMenuPending = () => {
-  return {
-    type: 'FETCH_PLAYLIST_MENU_PENDING'
-  };
+const fetchPlaylistMenuPending = () => ({ type: "FETCH_PLAYLIST_MENU_PENDING" });
+
+const fetchPlaylistMenuSuccess = playlists => ({ type: "FETCH_PLAYLIST_MENU_SUCCESS", playlists });
+
+const fetchPlaylistMenuError = () => ({ type: "FETCH_PLAYLIST_MENU_ERROR" });
+
+export const movePlaylist = (snapshot_id, from, to) => ({
+    type: "SORT_SONG",
+    snapshot_id,
+    from,
+    to
+});
+
+export const movePlaylistSong = (playlist, range_start, insert_before) => async dispatch => {
+    try {
+        const data = {
+            range_start,
+            insert_before: insert_before === 0 ? insert_before : insert_before + 1,
+            snapshot_id: playlist.snapshot_id
+        };
+        const response = await axios.put(`/playlists/${playlist.id}/tracks`, data);
+        dispatch(movePlaylist(response.data.snapshot_id, range_start, insert_before));
+        return response.data;
+    } catch (error) {
+        console.error('Error moving playlist song:', error);
+        return error;
+    }
 };
 
-export const fetchPlaylistMenuSuccess = (playlists) => {
-  return {
-    type: 'FETCH_PLAYLIST_MENU_SUCCESS',
-    playlists
-  };
-};
-
-export const fetchPlaylistMenuError = () => {
-  return {
-    type: 'FETCH_PLAYLIST_MENU_ERROR'
-  };
-};
-
-export const addPlaylistItem = (playlist) => {
-  return {
-    type: 'ADD_PLAYLIST_ITEM',
-    playlist
-  };
-};
-
-export const fetchPlaylistsMenu = (userId, accessToken) => {
-  return dispatch => {
-    const request = new Request(`https://api.spotify.com/v1/users/${userId}/playlists`, {
-      headers: new Headers({
-        'Authorization': 'Bearer ' + accessToken
-      })
-    });
-
+export const fetchPlaylistsMenu = () => async dispatch => {
     dispatch(fetchPlaylistMenuPending());
-
-    fetch(request).then(res => {
-      if(res.statusText === "Unauthorized") {
-        window.location.href = './';
-      }
-      return res.json();
-    }).then(res => {
-      dispatch(fetchPlaylistMenuSuccess(res.items));
-    }).catch(err => {
-      dispatch(fetchPlaylistMenuError(err));
-    });
-  };
+    try {
+        const response = await axios.get("/me/playlists");
+        dispatch(fetchPlaylistMenuSuccess(response.data));
+        return response.data;
+    } catch (error) {
+        dispatch(fetchPlaylistMenuError());
+        console.error('Error fetching playlists menu:', error);
+        return error;
+    }
 };
 
-
-export const fetchPlaylistSongsPending = () => {
-  return {
-    type: 'FETCH_PLAYLIST_SONGS_PENDING'
-  };
-};
-
-export const fetchPlaylistSongsSuccess = (songs) => {
-  return {
-    type: 'FETCH_PLAYLIST_SONGS_SUCCESS',
-    songs
-  };
-};
-
-export const fetchPlaylistSongsError = () => {
-  return {
-    type: 'FETCH_PLAYLIST_SONGS_ERROR'
-  };
-};
-
-export const fetchPlaylistSongs = (userId, playlistId, accessToken) => {
-  return dispatch => {
-    const request = new Request(`https://api.spotify.com/v1/users/${userId}/playlists/${playlistId}/tracks`, {
-      headers: new Headers({
-        'Authorization': 'Bearer ' + accessToken
-      })
-    });
-
-    dispatch(fetchPlaylistSongsPending());
-
-    fetch(request).then(res => {
-      return res.json();
-    }).then(res => {
-      //remove duplicate tracks
-      res.items = uniqBy(res.items, (item) => {
-        return item.track.id;
-      });
-      dispatch(fetchPlaylistSongsSuccess(res.items));
-    }).catch(err => {
-      dispatch(fetchPlaylistSongsError(err));
-    });
-  };
-};
+// Other action creators...
