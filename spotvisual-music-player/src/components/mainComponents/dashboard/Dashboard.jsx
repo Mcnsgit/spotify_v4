@@ -1,11 +1,11 @@
 // src/components/dashboard/Dashboard.jsx
 import React, { useReducer, useState } from 'react';
 import './Dashboard.css';
-import SearchBar from '../reusableComponents/SearchBar/SearchBar';
-import SearchResults from '../reusableComponents/SearchResults/SearchResults';
-import Footer from '../layoutComponents/footer/Footer';
+import SearchBar from '../../reusableComponents/SearchBar/SearchBar';
+import SearchResults from '../../reusableComponents/SearchResults/SearchResults';
+
 import { Container } from 'react-bootstrap';
-import SideMenu from '../layoutComponents/SideMenu/SideMenu';
+import SideMenu from '../../layoutComponents/SideMenu/SideMenu';
 // Initial state for the Dashboard component
 const initialState = {
   isPlaying: false,
